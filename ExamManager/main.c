@@ -7,9 +7,12 @@
 //
 
 #include <stdio.h>
+#include <stdlib.h>
+#include "cJSON.h"
 
 int main(int argc, const char * argv[]) {
-    // insert code here...
-    printf("Hello, World!\n");
+    for(int i=0; i< 5; i++){
+        printf("Hello, World!\n%d",i);
+    }
     return 0;
 }

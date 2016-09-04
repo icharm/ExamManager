@@ -7,9 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		5DE3F4C51D78F36A000AA913 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 5DE3F4C41D78F36A000AA913 /* main.c */; };
-		5DE3F4CD1D78F39F000AA913 /* cJSON.c in Sources */ = {isa = PBXBuildFile; fileRef = 5DE3F4CC1D78F39F000AA913 /* cJSON.c */; };
-		5DE3F4D01D78F3B6000AA913 /* test.c in Sources */ = {isa = PBXBuildFile; fileRef = 5DE3F4CF1D78F3B6000AA913 /* test.c */; };
+		5D890ED51D79FC4D0010BEA4 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 5DE3F4C41D78F36A000AA913 /* main.c */; };
+		5D890EDA1D7A025A0010BEA4 /* cJSON.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D890ED81D7A025A0010BEA4 /* cJSON.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,12 +24,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		5D890ED71D7A025A0010BEA4 /* cJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cJSON.h; sourceTree = "<group>"; };
+		5D890ED81D7A025A0010BEA4 /* cJSON.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cJSON.c; sourceTree = "<group>"; };
 		5DE3F4C11D78F36A000AA913 /* ExamManager */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ExamManager; sourceTree = BUILT_PRODUCTS_DIR; };
-		5DE3F4C41D78F36A000AA913 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
-		5DE3F4CB1D78F39F000AA913 /* cJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cJSON.h; path = "../../../../../Volumes/Untitled 2/git/ExamManager/cJSON.h"; sourceTree = "<group>"; };
-		5DE3F4CC1D78F39F000AA913 /* cJSON.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cJSON.c; path = "../../../../../Volumes/Untitled 2/git/ExamManager/cJSON.c"; sourceTree = "<group>"; };
-		5DE3F4CE1D78F3B6000AA913 /* tests */ = {isa = PBXFileReference; lastKnownFileType = folder; name = tests; path = "../../../../../Volumes/Untitled 2/git/ExamManager/tests"; sourceTree = "<group>"; };
-		5DE3F4CF1D78F3B6000AA913 /* test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = test.c; path = "../../../../../Volumes/Untitled 2/git/ExamManager/test.c"; sourceTree = "<group>"; };
+		5DE3F4C41D78F36A000AA913 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = main.c; sourceTree = "<group>"; usesTabs = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,11 +60,9 @@
 		5DE3F4C31D78F36A000AA913 /* ExamManager */ = {
 			isa = PBXGroup;
 			children = (
+				5D890ED71D7A025A0010BEA4 /* cJSON.h */,
+				5D890ED81D7A025A0010BEA4 /* cJSON.c */,
 				5DE3F4C41D78F36A000AA913 /* main.c */,
-				5DE3F4CE1D78F3B6000AA913 /* tests */,
-				5DE3F4CF1D78F3B6000AA913 /* test.c */,
-				5DE3F4CB1D78F39F000AA913 /* cJSON.h */,
-				5DE3F4CC1D78F39F000AA913 /* cJSON.c */,
 			);
 			path = ExamManager;
 			sourceTree = "<group>";
@@ -128,9 +123,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5DE3F4D01D78F3B6000AA913 /* test.c in Sources */,
-				5DE3F4C51D78F36A000AA913 /* main.c in Sources */,
-				5DE3F4CD1D78F39F000AA913 /* cJSON.c in Sources */,
+				5D890EDA1D7A025A0010BEA4 /* cJSON.c in Sources */,
+				5D890ED51D79FC4D0010BEA4 /* main.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -221,6 +215,7 @@
 		5DE3F4C91D78F36A000AA913 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				"OTHER_LDFLAGS[arch=*]" = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -228,6 +223,7 @@
 		5DE3F4CA1D78F36A000AA913 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				"OTHER_LDFLAGS[arch=*]" = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -251,6 +247,7 @@
 				5DE3F4CA1D78F36A000AA913 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

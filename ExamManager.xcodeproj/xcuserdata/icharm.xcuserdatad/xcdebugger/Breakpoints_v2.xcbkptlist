@@ -28,12 +28,28 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ExamManager/main.c"
-            timestampString = "494714988.850187"
+            timestampString = "494816987.710041"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "48"
-            endingLineNumber = "48"
-            landmarkName = "writefile()"
+            startingLineNumber = "283"
+            endingLineNumber = "283"
+            landmarkName = "addQuestion()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ExamManager/main.c"
+            timestampString = "494816987.710041"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "277"
+            endingLineNumber = "277"
+            landmarkName = "addQuestion()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

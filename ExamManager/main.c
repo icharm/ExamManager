@@ -8,14 +8,15 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "cJSON.h"
+//考生信息
+#define STU_FILE "/Users/icharm/git/ExamManager/ExamManager/students.bin"
+//试题信息
+#define QUE_FILE "/Users/icharm/git/ExamManager/ExamManager/questions.bin"
 //void addStudent();
 
-//考生信息结构体
-struct student {
-    const char *name;
-    int number;
-};
+
 
 
 //字符串转json
@@ -40,76 +41,428 @@ void writefile(char *filename, char * json)
 {
     FILE *f;long len;;
 
-    f=fopen(filename,"rb");
+    f=fopen(filename,"wb");
     if(!f){
         printf("打开文件错误！\n\n");
         exit(0);
     }
     len=strlen(json);
-    fwrite(json,1,len+1,f);
+    fwrite(json,len,1,f);
+    
     fclose(f);
+    //free(filename);
     free(json);
-    free(filename);
 }
 
 //读取文件
-void readfile(char *filename)
+cJSON *readfile(char *filename)
 {
     FILE *f;long len;char *data;
+    cJSON *json;
     
-    f=fopen(filename,"wb");fseek(f,0,SEEK_END);len=ftell(f);fseek(f,0,SEEK_SET);
+    f=fopen(filename,"rb");
+    fseek(f,0,SEEK_END);
+    len=ftell(f);
+    fseek(f,0,SEEK_SET);
     data=(char*)malloc(len+1);fread(data,1,len,f);fclose(f);
-    doit(data);
+    //doit(data);
+    //printf("%s\n",data);
+    json = cJSON_Parse(data);
     free(data);
+    return json;
+    
 }
 
-
-
+/*******************考生管理****************/
+//添加考生
 void addStudent(){
     char *name;
+    char *stu_arr[100];
     name = (char *)malloc(100);
-    int number;
-    cJSON * root, *info;
+    cJSON * root, *stu_json;
     char *out;
-    printf("请输入考生编号:\n");
-    scanf("%d",&number);
+
     printf("请输入考生姓名:\n");
     scanf("%s",name);
     
-    struct student tmp[0];
-    tmp[0].name=name;
-    tmp[0].number=number;
-    
-    root = cJSON_CreateObject();
-    info=cJSON_CreateObject();
-
-        cJSON_AddItemToObject(root, tmp[0].name, info);
-        cJSON_AddStringToObject(info, "姓名", tmp[0].name);
-        cJSON_AddNumberToObject(info, "编号", number);
-
+    //读取考生信息
+    stu_json = readfile(STU_FILE);
+    cJSON *stu_child;
+    if(stu_json->child){
+        stu_child = stu_json->child;
+    }
+    int stu_count = -1;
+    do{
+        stu_count++;
+        stu_arr[stu_count] = stu_child->valuestring;
+        stu_child = stu_child->next;
+    }while(stu_child);
+    stu_count++;
+    stu_arr[stu_count] = name;
+    root = cJSON_CreateArray();
+    for(int j=0; j<=stu_count; j++){
+        cJSON_AddItemToArray(root, cJSON_CreateString(stu_arr[j]));
+    }
     out = cJSON_Print(root);
-    writefile("/Users/icharm/git/ExamManager/ExamManager/students.strings", out);
+    writefile(STU_FILE, out);
+    cJSON_Delete(root);
+    cJSON_Delete(stu_child);
+    cJSON_Delete(stu_json);
+    printf("添加成功！\n");
+    free(name);
     
+}
+
+//修改考生
+void modifyStudent()
+{
+    char *name;
+    name = (char *)malloc(100);
+    printf("请输入需要修改的考生名：\n");
+    scanf("%s", name);
+    
+    cJSON * stu_json;
+    cJSON * stu_child;
+    cJSON * root;
+    char * out;
+    char * stu_arr[100];
+    //读取考生信息
+    stu_json = readfile(STU_FILE);
+    if(stu_json->child){
+        stu_child = stu_json->child;
+    }
+    int stu_count = -1;
+    do{
+        stu_count++;
+        stu_arr[stu_count] = stu_child->valuestring;
+        stu_child = stu_child->next;
+    }while(stu_child);
+    int flag = 1;
+    int j;
+    for(j =0; j<=stu_count; j++){
+         flag = strcmp(stu_arr[j], name);
+        if(flag == 0){
+            break;
+        }
+    }
+    if(flag != 0){
+        printf("未找到该用户!\n");
+        cJSON_Delete(stu_child);
+        cJSON_Delete(stu_json);
+        free(name);
+        exit(0);
+    }else{
+        char * name_new;
+        name_new = (char *)malloc(100);
+        printf("请输入修改后的用户名:\n");
+        scanf("%s", name_new);
+        
+        stu_arr[j] = name_new;
+        root = cJSON_CreateArray();
+        for(int j=0; j<=stu_count; j++){
+            cJSON_AddItemToArray(root, cJSON_CreateString(stu_arr[j]));
+        }
+        out = cJSON_Print(root);
+        writefile(STU_FILE, out);
+        free(name_new);
+        printf("修改成功！");
+    }
     
     cJSON_Delete(root);
-    printf("%s\n",out);
+    cJSON_Delete(stu_child);
+    cJSON_Delete(stu_json);
     free(name);
 }
 
-void modifyStudent()
-{
+//删除考生
+void deleteStudent(){
     
+    char *name;
+    name = (char *)malloc(100);
+    printf("请输入需要删除的考生名：\n");
+    scanf("%s", name);
+    
+    cJSON * stu_json;
+    cJSON * stu_child;
+    cJSON * root;
+    char * out;
+    char * stu_arr[100];
+    //读取考生信息
+    stu_json = readfile(STU_FILE);
+    if(stu_json->child){
+        stu_child = stu_json->child;
+    }
+    int stu_count = -1;
+    do{
+        stu_count++;
+        stu_arr[stu_count] = stu_child->valuestring;
+        stu_child = stu_child->next;
+    }while(stu_child);
+    int flag = 1;
+    int j;
+    for(j =0; j<=stu_count; j++){
+        flag = strcmp(stu_arr[j], name);
+        if(flag == 0){
+            break;
+        }
+    }
+    if(flag != 0){
+        printf("未找到该用户!\n");
+        cJSON_Delete(stu_child);
+        cJSON_Delete(stu_json);
+        free(name);
+        exit(0);
+    }else{
+        for(;j<stu_count;j++){
+            stu_arr[j] = stu_arr[j+1];
+        }
+        root = cJSON_CreateArray();
+        for(int j=0; j<stu_count; j++){
+            cJSON_AddItemToArray(root, cJSON_CreateString(stu_arr[j]));
+        }
+        out = cJSON_Print(root);
+        writefile(STU_FILE, out);
+        printf("删除成功！\n");
+    }
+    
+    cJSON_Delete(root);
+    cJSON_Delete(stu_child);
+    cJSON_Delete(stu_json);
+    free(name);
+
+}
+/***************试题管理********************/
+//增加试题
+void addQuestion(){
+    char *question_h;
+    question_h = (char *)malloc(500);
+    char *question_b;
+    question_b = (char *)malloc(500);
+    char *right;
+    right = (char *)malloc(10);
+    
+    cJSON * root;
+    char *out;
+    fflush(stdin);
+    getchar();
+    printf("请输入题干:\n");
+    gets(question_h);
+    printf("请输入选项:\n");
+    gets(question_b);
+    printf("请输入正确答案:\n");
+    gets(right);
+    
+    cJSON * ques, * ques_child;
+    char *ques_arr[300][3];
+    //读取试题信息
+    ques = readfile(QUE_FILE);
+    
+    if(ques->child){
+       ques_child = ques->child;
+    }
+    int ques_count = -1;
+    do{
+        ques_count++;
+        cJSON * ques_child_c;
+        //if(!ques_child->next){
+            ques_child_c = ques_child->child;
+        //}
+        int q_count = -1;
+        do{
+            q_count++;
+            ques_arr[ques_count][q_count] = ques_child_c->valuestring;
+            ques_child_c = ques_child_c->next;
+        }while(ques_child_c);
+        cJSON_Delete(ques_child_c);
+        ques_child = ques_child->next;
+    }while(ques_child);
+    
+    ques_count++;
+    ques_arr[ques_count][0] = question_h;
+    ques_arr[ques_count][1] = question_b;
+    ques_arr[ques_count][2] = right;
+    
+    
+    root = cJSON_CreateArray();
+    cJSON *que[ques_count];
+    for(int i=0; i<=ques_count; i++){
+        que[i] = cJSON_CreateArray();
+        cJSON_AddItemToArray(que[i], cJSON_CreateString(ques_arr[i][0]));
+        cJSON_AddItemToArray(que[i], cJSON_CreateString(ques_arr[i][1]));
+        cJSON_AddItemToArray(que[i], cJSON_CreateString(ques_arr[i][2]));
+        cJSON_AddItemToArray(root, que[i]);
+    }
+    
+    out = cJSON_Print(root);
+    writefile(QUE_FILE, out);
+    
+    printf("添加成功！\n");
+    cJSON_Delete(ques_child);
+    cJSON_Delete(ques);
+    cJSON_Delete(root);
+    free(question_b);
+    free(question_h);
+    free(right);
+    main();
 }
 
-void deleteStudent(){
+//修改试题
+void modifyQuestion(){
+    int id;
+    char *question_h;
+    question_h = (char *)malloc(500);
+    char *question_b;
+    question_b = (char *)malloc(500);
+    char *right;
+    right = (char *)malloc(10);
+    
+    printf("请输入想要修改的试题序号:\n");
+    scanf("%d",&id);
+    fflush(stdin);
+    getchar();
+    printf("请输入题干:\n");
+    gets(question_h);
+    printf("请输入选项:\n");
+    gets(question_b);
+    printf("请输入正确答案:\n");
+    gets(right);
+    
+    
+    cJSON * ques;
+    cJSON * ques_child;
+    char *ques_arr[300][3];
+    //读取试题信息
+    ques = readfile(QUE_FILE);
+    
+    if(ques->child){
+        ques_child = ques->child;
+    }
+    int ques_count = -1;
+    do{
+        ques_count++;
+        cJSON * ques_child_c;
+        //if(!ques_child->next){
+        ques_child_c = ques_child->child;
+        //}
+        int q_count = -1;
+        do{
+            q_count++;
+            ques_arr[ques_count][q_count] = ques_child_c->valuestring;
+            ques_child_c = ques_child_c->next;
+        }while(ques_child_c);
+        cJSON_Delete(ques_child_c);
+        ques_child = ques_child->next;
+    }while(ques_child);
+    
+    
+        ques_arr[id][0] = question_h;
+        ques_arr[id][1] = question_b;
+        ques_arr[id][2] = right;
+   
+    cJSON *root;
+    char *out;
+    root = cJSON_CreateArray();
+    cJSON *que[ques_count];
+    for(int i=0; i<=ques_count; i++){
+        que[i] = cJSON_CreateArray();
+        cJSON_AddItemToArray(que[i], cJSON_CreateString(ques_arr[i][0]));
+        cJSON_AddItemToArray(que[i], cJSON_CreateString(ques_arr[i][1]));
+        cJSON_AddItemToArray(que[i], cJSON_CreateString(ques_arr[i][2]));
+        cJSON_AddItemToArray(root, que[i]);
+    }
+    
+    out = cJSON_Print(root);
+    writefile(QUE_FILE, out);
+    
+    printf("修改成功！\n");
+    
+    cJSON_Delete(ques);
+    cJSON_Delete(ques_child);
+    cJSON_Delete(root);
+    main();
+}
 
+//删除试题
+void deleteQuestion(){
+    int id;
+    printf("请输入想要删除的试题序号:\n");
+    scanf("%d",&id);
+    
+    cJSON * ques;
+    cJSON * ques_child;
+    char *ques_arr[300][3];
+    //读取试题信息
+    ques = readfile(QUE_FILE);
+    
+    if(ques->child){
+        ques_child = ques->child;
+    }
+    int ques_count = -1;
+    do{
+        ques_count++;
+        cJSON * ques_child_c;
+        //if(!ques_child->next){
+        ques_child_c = ques_child->child;
+        //}
+        int q_count = -1;
+        do{
+            q_count++;
+            ques_arr[ques_count][q_count] = ques_child_c->valuestring;
+            ques_child_c = ques_child_c->next;
+        }while(ques_child_c);
+        cJSON_Delete(ques_child_c);
+        ques_child = ques_child->next;
+    }while(ques_child);
+    
+    for(int i=id; i<=ques_count;i++){
+        ques_arr[i][0] = ques_arr[i+1][0];
+        ques_arr[i][1] = ques_arr[i+1][1];
+        ques_arr[i][2] = ques_arr[i+1][2];
+    }
+    cJSON *root;
+    char *out;
+    root = cJSON_CreateArray();
+    cJSON *que[ques_count-1];
+    for(int i=0; i<=ques_count-1; i++){
+        que[i] = cJSON_CreateArray();
+        cJSON_AddItemToArray(que[i], cJSON_CreateString(ques_arr[i][0]));
+        cJSON_AddItemToArray(que[i], cJSON_CreateString(ques_arr[i][1]));
+        cJSON_AddItemToArray(que[i], cJSON_CreateString(ques_arr[i][2]));
+        cJSON_AddItemToArray(root, que[i]);
+    }
+    
+    out = cJSON_Print(root);
+    writefile(QUE_FILE, out);
+    
+    printf("删除成功！\n");
+
+    cJSON_Delete(ques);
+    cJSON_Delete(ques_child);
+    cJSON_Delete(root);
+    main();
 
 }
 
 
 void studentManager(){
     int flag = 0;
+    printf("^v^v^v^v^v^v^考生信息如下^v^v^v^v^v^v^\n");
+    
+    cJSON * stu_json;
+    cJSON * stu_child;
+    //读取考生信息
+    stu_json = readfile(STU_FILE);
+    if(stu_json->child){
+        stu_child = stu_json->child;
+    }
+    do{
+        printf("%s\n", stu_child->valuestring);
+        stu_child = stu_child->next;
+    }while(stu_child);
+    cJSON_Delete(stu_json);
+    cJSON_Delete(stu_child);
     printf("^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^\n");
+    
     printf("请输入序号：\n");
     printf("1. 增加考生信息\n");
     printf("2. 修改考生信息\n");
@@ -130,7 +483,7 @@ input_s:scanf("%d",&flag);
             deleteStudent();
             break;
         case 4:
-            main(NULL,NULL);
+            main();
             break;
         default:
             printf("错误序号重新输入\n");
@@ -141,11 +494,81 @@ input_s:scanf("%d",&flag);
 }
 
 void ExamManager(){
+    
+    
+    int flag = 0;
+    printf("^v^v^v^v^v^v^试题信息如下^v^v^v^v^v^v^\n");
+    
+    cJSON * ques;
+    cJSON * ques_child;
+    char *ques_arr[300][3];
+    //读取试题信息
+    ques = readfile(QUE_FILE);
+    
+    if(ques->child){
+        ques_child = ques->child;
+    }
+    int ques_count = -1;
+    do{
+        ques_count++;
+        cJSON * ques_child_c;
+        //if(!ques_child->next){
+        ques_child_c = ques_child->child;
+        //}
+        int q_count = -1;
+        do{
+            q_count++;
+            ques_arr[ques_count][q_count] = ques_child_c->valuestring;
+            ques_child_c = ques_child_c->next;
+        }while(ques_child_c);
+        cJSON_Delete(ques_child_c);
+        ques_child = ques_child->next;
+    }while(ques_child);
+    
+    for(int i=0; i<=ques_count;i++){
+        printf("%d. %s\n",i,ques_arr[i][0]);
+        printf("\t%s\t正确答案:%s\n",ques_arr[i][1],ques_arr[i][2]);
+    }
+    cJSON_Delete(ques);
+    cJSON_Delete(ques_child);
+    printf("^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^\n");
+    
+    printf("请输入序号：\n");
+    printf("1. 增加考题\n");
+    printf("2. 修改考题\n");
+    printf("3. 删除考题\n\n");
+    printf("4. 返回上一层菜单\n");
+    
+    
+input_s:scanf("%d",&flag);
+    
+    switch (flag) {
+        case 1:
+            addQuestion();
+            break;
+        case 2:
+            modifyQuestion();
+            break;
+        case 3:
+            deleteQuestion();
+            break;
+        case 4:
+            main();
+            break;
+        default:
+            printf("错误序号重新输入\n");
+            goto input_s;
+            break;
+    }
 
 }
 
 void joinExam(){
-
+    char name[100];
+    printf("请输入考生名");
+    scanf("%s",name);
+    
+    
 }
 
 int fetchScore(){
@@ -153,7 +576,7 @@ int fetchScore(){
     return 0;
 }
 
-int main(int argc, const char * argv[]) {
+int main() {
     int flag = 0;
     printf("^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^\n");
     printf("欢迎使用考生管理系统V1.0\n");

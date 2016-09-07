@@ -9,11 +9,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "cJSON.h"
 //考生信息
-#define STU_FILE "/Users/icharm/git/ExamManager/ExamManager/students.bin"
+#define STU_FILE "/Users/ZH96/Desktop/ExamManager-master/ExamManager/students.bin"
 //试题信息
-#define QUE_FILE "/Users/icharm/git/ExamManager/ExamManager/questions.bin"
+#define QUE_FILE "/Users/ZH96/Desktop/ExamManager-master/ExamManager/questions.bin"
+//考试成绩信息
+#define EXAM_FILE "/Users/ZH96/Desktop/ExamManager-master/ExamManager/examinfo.bin"
+
 //void addStudent();
 
 
@@ -562,18 +566,195 @@ input_s:scanf("%d",&flag);
     }
 
 }
-
+//参加考试
 void joinExam(){
     char name[100];
-    printf("请输入考生名");
+    printf("请输入考生名:\n");
     scanf("%s",name);
+    cJSON *stu_json, *stu_child;
+    
+    char *stu_arr[100];
+    //读取考生信息
+    stu_json = readfile(STU_FILE);
+    if(stu_json->child){
+        stu_child = stu_json->child;
+    }
+    int stu_count = -1;
+    do{
+        stu_count++;
+        stu_arr[stu_count] = stu_child->valuestring;
+        stu_child = stu_child->next;
+    }while(stu_child);
+    int flag = 1;
+    int j;
+    for(j =0; j<=stu_count; j++){
+        flag = strcmp(stu_arr[j], name);
+        if(flag == 0){
+            break;
+        }
+    }
+    if(flag != 0){
+        printf("未找到该考生!\n");
+        cJSON_Delete(stu_child);
+        cJSON_Delete(stu_json);
+        free(name);
+        exit(0);
+    }else{
+        printf("现在开始答题\n");
+        cJSON * ques;
+        cJSON * ques_child;
+        char *ques_arr[300][3];
+        //读取试题信息
+        ques = readfile(QUE_FILE);
+        
+        if(ques->child){
+            ques_child = ques->child;
+        }
+        int ques_count = -1;
+        do{
+            ques_count++;
+            cJSON * ques_child_c;
+            //if(!ques_child->next){
+            ques_child_c = ques_child->child;
+            //}
+            int q_count = -1;
+            do{
+                q_count++;
+                ques_arr[ques_count][q_count] = ques_child_c->valuestring;
+                ques_child_c = ques_child_c->next;
+            }while(ques_child_c);
+            cJSON_Delete(ques_child_c);
+            ques_child = ques_child->next;
+        }while(ques_child);
+        
+        //生成随机数
+        int count = 0; //计数，共5题
+        int base[5];
+        srand((unsigned)time(NULL)); //用当前系统时间设置种子
+        for(; count<5; count++){
+            base[count] = rand()%13;
+            int tmp = base[count];
+            printf("%d. %s\n",count,ques_arr[tmp][0]);
+            printf("%s\n\n", ques_arr[tmp][1]);
+        }
+        
+        char answer[100];
+        printf("请依次输入答案，空格隔开\n");
+        getchar();
+        gets(answer);
+        char *token = strtok(answer, " ");
+        char *answer_arr[10];
+        int i = 0;
+        while(token){
+            answer_arr[i] = token;
+            i++;
+            token = strtok(NULL, " ");
+        }
+        //验证答案
+        int score = 0;
+        for(int i=0; i<5; i++){
+            int j = base[i];
+            if(!strcmp(answer_arr[i],ques_arr[j][2])){
+                score += 20;
+            }
+            //puts(answer_arr[i]);
+        }
+        
+        printf("考试结束，正确率：%d\n",score);
+        
+        //读取考试成绩数据
+        cJSON *scoreData;
+        char * sc_arr[500][2];
+        scoreData = readfile(EXAM_FILE);
+        if(scoreData->child){
+            scoreData = scoreData->child;
+        }
+        int sc_count = -1;
+        do{
+            sc_count++;
+            cJSON * sc_child_c;
+            //if(!ques_child->next){
+            sc_child_c = scoreData->child;
+            //}
+            int q_count = -1;
+            do{
+                q_count++;
+                sc_arr[sc_count][q_count] = sc_child_c->valuestring;
+                sc_child_c = sc_child_c->next;
+            }while(sc_child_c);
+            cJSON_Delete(sc_child_c);
+            scoreData = scoreData->next;
+        }while(scoreData);
+        
+        char score_s[5];
+        sprintf(score_s, "%d", score);
+        sc_count++;
+        sc_arr[sc_count][0] = name;
+        sc_arr[sc_count][1] = score_s;
+        
+        
+        cJSON *root, *info[500];
+        char * out;
+        root = cJSON_CreateArray();
+        for(int i=0; i<=sc_count; i++){
+            info[i] = cJSON_CreateArray();
+            cJSON_AddItemToArray(info[i], cJSON_CreateString(sc_arr[i][0]));
+            cJSON_AddItemToArray(info[i], cJSON_CreateString(sc_arr[i][1]));
+            cJSON_AddItemToArray(root, info[i]);
+        }
+        
+        out = cJSON_Print(root);
+        writefile(EXAM_FILE, out);
+        cJSON_Delete(scoreData);
+        cJSON_Delete(root);
+        cJSON_Delete(ques);
+        cJSON_Delete(ques_child);
+        
+    }
     
     
 }
 
-int fetchScore(){
-
-    return 0;
+void fetchScore(){
+    char name[100];
+    printf("请输入考生姓名:\n");
+    scanf("%s", name);
+    //读取考试成绩数据
+    cJSON *scoreData;
+    char * sc_arr[500][2];
+    scoreData = readfile(EXAM_FILE);
+    if(scoreData->child){
+        scoreData = scoreData->child;
+    }
+    int sc_count = -1;
+    do{
+        sc_count++;
+        cJSON * sc_child_c;
+        //if(!ques_child->next){
+        sc_child_c = scoreData->child;
+        //}
+        int q_count = -1;
+        do{
+            q_count++;
+            sc_arr[sc_count][q_count] = sc_child_c->valuestring;
+            sc_child_c = sc_child_c->next;
+        }while(sc_child_c);
+        cJSON_Delete(sc_child_c);
+        scoreData = scoreData->next;
+    }while(scoreData);
+    
+    int flag=1;
+    printf("\n");
+    for(int i=0;i<=sc_count;i++){
+        if(!strcmp(sc_arr[i][0],name)){
+            flag = 0;
+            printf("%s %s\n",sc_arr[i][0],sc_arr[i][1]);
+        }
+    }
+    if(flag == 1){
+        printf("未找到考生数据！\n");
+    }
+    
 }
 
 int main() {

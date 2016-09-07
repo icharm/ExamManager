@@ -28,12 +28,28 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ExamManager/main.c"
-            timestampString = "494816987.710041"
+            timestampString = "494901153.513399"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "283"
-            endingLineNumber = "283"
-            landmarkName = "addQuestion()"
+            startingLineNumber = "692"
+            endingLineNumber = "692"
+            landmarkName = "joinExam()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ExamManager/main.c"
+            timestampString = "494900055.381449"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "681"
+            endingLineNumber = "681"
+            landmarkName = "joinExam()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -44,12 +60,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ExamManager/main.c"
-            timestampString = "494816987.710041"
+            timestampString = "494900395.556999"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "277"
-            endingLineNumber = "277"
-            landmarkName = "addQuestion()"
+            startingLineNumber = "669"
+            endingLineNumber = "669"
+            landmarkName = "joinExam()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
